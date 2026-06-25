@@ -13,7 +13,17 @@ interface DeployBody {
 
 const jobs = new Map<string, LocalJob>();
 
-export default async function deployRoutes(fastify: FastifyInstance) {
+interface DeployOptions {
+  defaultServerUrl?: string;
+}
+
+export default async function deployRoutes(fastify: FastifyInstance, options: DeployOptions) {
+  const defaultServerUrl = options.defaultServerUrl || 'https://dockdock.baiduapi.com';
+
+  fastify.get('/config', async (request, reply) => {
+    return { serverUrl: defaultServerUrl };
+  });
+
   fastify.post<{ Body: DeployBody }>('/deploy', async (request, reply) => {
     const { image, serverUrl, serverToken } = request.body;
     const tag = request.body.tag || 'latest';
@@ -75,11 +85,16 @@ export default async function deployRoutes(fastify: FastifyInstance) {
 
   fastify.get('/tags/:namespace/:repo', async (request, reply) => {
     const { namespace, repo } = request.params as { namespace: string; repo: string };
-    const { serverUrl, serverToken } = request.query as any;
+    const { serverUrl, serverToken, name } = request.query as any;
     if (!serverUrl) {
       return reply.status(400).send({ error: 'serverUrl is required' });
     }
-    const url = `${serverUrl}/api/v1/images/tags/${encodeURIComponent(namespace)}/${encodeURIComponent(repo)}`;
+    const params = new URLSearchParams();
+    if (name && String(name).trim()) {
+      params.set('name', String(name).trim());
+    }
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    const url = `${serverUrl}/api/v1/images/tags/${encodeURIComponent(namespace)}/${encodeURIComponent(repo)}${queryString}`;
     const res = await fetch(url, {
       headers: serverToken ? { Authorization: `Bearer ${serverToken}` } : {},
     });

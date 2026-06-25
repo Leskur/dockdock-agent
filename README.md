@@ -11,7 +11,10 @@ User-side agent for managing local Docker containers and receiving images from a
 
 ```bash
 npm install
+cp .env.example .env
 ```
+
+Edit `.env` to adjust the default Server URL, port, and host if needed.
 
 ## Run
 
@@ -22,6 +25,14 @@ npm run dev
 Agent listens on `http://0.0.0.0:8910` by default.
 
 Open the browser at `http://服务器IP:8910` to use the web UI.
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `8910` | Agent listening port |
+| `HOST` | `0.0.0.0` | Agent listening host |
+| `DEFAULT_SERVER_URL` | `https://dockdock.baiduapi.com` | Default Server URL shown in the web UI |
 
 ## API
 

@@ -1,82 +1,49 @@
 # DockDock Agent
 
-用于从 DockDock Server 下载 Docker 镜像的客户端。
+DockDock Agent 是一个 Docker 镜像部署工具，专为无法正常拉取 Docker Hub 镜像的环境设计。
+
+通过配合 [DockDock Server](https://github.com/Leskur/dockdock-server) 作为镜像代理，用户可以在网络受限的环境下搜索、下载并部署 Docker 镜像，全程通过 Web 界面操作，无需命令行。
+
+## 特性
+
+- 通过 DockDock Server 代理拉取镜像，解决 Docker Hub 访问失败问题
+- 搜索镜像直接部署，无需手动 `docker pull` + `docker run`
+- 单文件分发，服务器零依赖
+- 一键安装，自动注册为系统服务
+
+## 截图
+
+<!-- TODO: 添加 Web 界面截图 -->
+![Web 界面](docs/screenshot.png)
 
 ## 环境要求
 
-- Node.js 18+
+- Linux x64 / arm64
 - 已安装 Docker，且 `docker` 命令在 PATH 中可用
 
-## 安装
+## 一键安装
 
 ```bash
-npm install
-cp .env.example .env
+curl -fsSL https://raw.githubusercontent.com/Leskur/dockdock-agent/main/install.sh | bash
 ```
 
-按需编辑 `.env`，调整默认端口、监听地址和 Server URL。
+安装完成后自动注册为 systemd 服务并启动。
 
-## 运行
+Web 界面：`http://服务器IP:8910`
+
+> 如果无法直接访问 GitHub，可通过代理安装：`curl -fsSL https://raw.githubusercontent.com/Leskur/dockdock-agent/main/install.sh | https_proxy=http://127.0.0.1:7890 bash`
+
+## 卸载
 
 ```bash
-npm run dev
+curl -fsSL https://raw.githubusercontent.com/Leskur/dockdock-agent/main/uninstall.sh | bash
 ```
 
-Agent 默认监听 `http://0.0.0.0:8910`。
-
-打开浏览器访问 `http://服务器IP:8910` 即可使用 Web 界面。
-
-## 环境变量
-
-| 变量 | 默认值 | 说明 |
-|----------|---------|-------------|
-| `PORT` | `8910` | Agent 监听端口 |
-| `HOST` | `0.0.0.0` | Agent 监听地址 |
-| `DEFAULT_SERVER_URL` | `https://dockdock.baiduapi.com` | Web 界面中默认显示的 Server URL |
-
-## API
-
-### 部署镜像
+## 服务管理
 
 ```bash
-POST /api/v1/deploy
-{
-  "image": "nginx",
-  "tag": "1.25",
-  "serverUrl": "https://dockdock.baiduapi.com",
-  "serverToken": "optional"
-}
-```
-
-响应：
-
-```json
-{
-  "id": "uuid",
-  "status": "pending"
-}
-```
-
-### 列出所有任务
-
-```bash
-GET /api/v1/jobs
-```
-
-### 查看任务状态
-
-```bash
-GET /api/v1/jobs/:id
-```
-
-### 搜索 Docker Hub 镜像（通过 Server 代理）
-
-```bash
-GET /api/v1/search?q=nginx&serverUrl=https://dockdock.baiduapi.com
-```
-
-### 列出镜像标签（通过 Server 代理）
-
-```bash
-GET /api/v1/tags/library/nginx?serverUrl=https://dockdock.baiduapi.com
+systemctl status dockdock-agent    # 查看状态
+systemctl restart dockdock-agent   # 重启
+systemctl stop dockdock-agent      # 停止
+journalctl -u dockdock-agent -f    # 查看日志
 ```

@@ -270,15 +270,15 @@
   <header>
     <h1>DockDock Agent</h1>
     <nav>
-      <button class="tab active" data-tab="deploy">Deploy</button>
-      <button class="tab" data-tab="jobs">Jobs</button>
+      <button class="tab active" data-tab="deploy">部署</button>
+      <button class="tab" data-tab="jobs">任务</button>
     </nav>
   </header>
 
   <main>
     <section id="deploy" class="panel active">
       <div class="card">
-        <h2>Deploy Image</h2>
+        <h2>部署镜像</h2>
         <form id="deployForm">
           <input type="text" id="image" style="display:none" required>
           <input type="text" id="tag" style="display:none">
@@ -286,22 +286,22 @@
           <input type="text" id="serverToken" style="display:none">
 
           <div class="form-section">
-            <div class="form-section-title">Image</div>
+            <div class="form-section-title">镜像</div>
             <div class="form-field">
-              <div class="field-label">Search image</div>
+              <div class="field-label">搜索镜像</div>
               <div class="search-row">
                 <input type="text" id="searchQuery" placeholder="nginx, redis, node...">
-                <button type="button" class="btn-secondary" id="searchBtn" onclick="searchImages()">Search</button>
+                <button type="button" class="btn-secondary" id="searchBtn" onclick="searchImages()">搜索</button>
               </div>
               <div id="searchResults" class="search-results"></div>
               <div id="selectedImage" class="selected-image"></div>
             </div>
             <div class="form-field">
-              <div class="field-label">Tag</div>
-              <div style="margin-bottom:8px;font-size:12px;color:#9ca3af">Search and select a tag, or skip to use <strong>latest</strong>.</div>
+              <div class="field-label">标签</div>
+              <div style="margin-bottom:8px;font-size:12px;color:#9ca3af">搜索并选择标签，不选则默认使用 <strong>latest</strong></div>
               <div class="search-row tag-search-row">
-                <input type="text" id="tagSearch" placeholder="Select an image first" disabled>
-                <button type="button" class="btn-secondary" id="tagSearchBtn" onclick="loadTags()" disabled>Search</button>
+                <input type="text" id="tagSearch" placeholder="请先选择镜像" disabled>
+                <button type="button" class="btn-secondary" id="tagSearchBtn" onclick="loadTags()" disabled>搜索</button>
               </div>
               <div id="tagList" class="tag-list" style="margin-top:10px"></div>
               <div id="selectedTag" class="selected-tag"></div>
@@ -309,9 +309,9 @@
           </div>
 
           <div class="form-section">
-            <div class="form-section-title">Deploy</div>
+            <div class="form-section-title">部署</div>
             <div id="deploySummary" class="deploy-summary"></div>
-            <button type="button" class="btn-primary" id="deployBtn" onclick="deployImage()">Deploy</button>
+            <button type="button" class="btn-primary" id="deployBtn" onclick="deployImage()">部署</button>
           </div>
         </form>
         <div id="deployStatus" class="status"></div>
@@ -320,8 +320,8 @@
 
     <section id="jobs" class="panel">
       <div class="card">
-        <h2>Deployment Jobs <span class="refresh" onclick="loadJobs()">Refresh</span></h2>
-        <div id="jobsList"><div class="empty">No jobs yet</div></div>
+        <h2>部署任务 <span class="refresh" onclick="loadJobs()">刷新</span></h2>
+        <div id="jobsList"><div class="empty">暂无任务</div></div>
       </div>
     </section>
 
@@ -357,7 +357,7 @@
       const form = document.getElementById('deployForm');
       if (!form.reportValidity()) return;
       deployBtn.disabled = true;
-      deployStatus.textContent = 'Starting deployment...';
+      deployStatus.textContent = '正在启动部署...';
       deployStatus.className = 'status show';
       const image = document.getElementById('image').value;
       const tag = document.getElementById('tag').value;
@@ -370,11 +370,11 @@
           body: JSON.stringify({ image, tag, serverUrl, serverToken }),
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed');
-        deployStatus.textContent = 'Deployment started: ' + data.id;
+        if (!res.ok) throw new Error(data.error || '部署失败');
+        deployStatus.textContent = '部署已开始：' + data.id;
         switchTab('jobs');
       } catch (err) {
-        deployStatus.textContent = 'Error: ' + err.message;
+        deployStatus.textContent = '错误：' + err.message;
       } finally {
         updateDeployButton();
       }
@@ -405,20 +405,20 @@
       const btn = document.getElementById('searchBtn');
       if (!query) return;
       if (!serverUrl) {
-        resultsEl.innerHTML = '<div class="empty">Please fill Server URL first</div>';
+        resultsEl.innerHTML = '<div class="empty">请先填写 Server URL</div>';
         resultsEl.className = 'search-results show';
         return;
       }
       btn.disabled = true;
-      btn.textContent = 'Searching...';
-      resultsEl.innerHTML = '<div class="empty">Searching...</div>';
+      btn.textContent = '搜索中...';
+      resultsEl.innerHTML = '<div class="empty">搜索中...</div>';
       resultsEl.className = 'search-results show';
       try {
         const res = await fetch(`api/v1/search?q=${encodeURIComponent(query)}&serverUrl=${encodeURIComponent(serverUrl)}&serverToken=${encodeURIComponent(serverToken)}`);
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Search failed');
+        if (!res.ok) throw new Error(data.error || '搜索失败');
         if (!data.results || !data.results.length) {
-          resultsEl.innerHTML = '<div class="empty">No results</div>';
+          resultsEl.innerHTML = '<div class="empty">没有结果</div>';
           return;
         }
         resultsEl.innerHTML = data.results.map(r => {
@@ -426,16 +426,16 @@
           return `
             <div class="search-result-item" onclick="selectImage('${escapeJs(r.namespace)}', '${escapeJs(r.repo)}')">
               <div class="result-name">${escapeHtml(r.name || displayPath)} ${r.isOfficial ? '<span class="official-badge">Official</span>' : ''}</div>
-              <div class="result-desc">${escapeHtml(r.description || 'No description')}</div>
+              <div class="result-desc">${escapeHtml(r.description || '暂无描述')}</div>
               <div class="result-meta">Stars: ${formatNumber(r.starCount)} | Pulls: ${escapeHtml(r.pullCount)}</div>
             </div>
           `;
         }).join('');
       } catch (err) {
-        resultsEl.innerHTML = '<div class="empty">Error: ' + escapeHtml(err.message) + '</div>';
+        resultsEl.innerHTML = '<div class="empty">错误：' + escapeHtml(err.message) + '</div>';
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Search';
+        btn.textContent = '搜索';
       }
     }
 
@@ -445,7 +445,7 @@
       const displayName = namespace === 'library' ? repo : `${namespace}/${repo}`;
       document.getElementById('image').value = displayName;
       const selImg = document.getElementById('selectedImage');
-      selImg.innerHTML = 'Selected: <strong>' + escapeHtml(displayName) + '</strong>';
+      selImg.innerHTML = '已选镜像：<strong>' + escapeHtml(displayName) + '</strong>';
       selImg.className = 'selected-image show';
       document.getElementById('searchResults').className = 'search-results';
       document.getElementById('tag').value = '';
@@ -454,7 +454,7 @@
       selTag.innerHTML = '';
       selTag.className = 'selected-tag';
       document.getElementById('tagSearch').disabled = false;
-      document.getElementById('tagSearch').placeholder = 'Default: latest';
+      document.getElementById('tagSearch').placeholder = '默认：latest';
       document.getElementById('tagSearchBtn').disabled = false;
       updateDeploySummary();
       updateDeployButton();
@@ -466,28 +466,28 @@
       const serverToken = document.getElementById('serverToken').value.trim();
       const tagSearch = document.getElementById('tagSearch').value.trim();
       const tagListEl = document.getElementById('tagList');
-      tagListEl.innerHTML = '<div class="tag-empty">Loading tags...</div>';
+      tagListEl.innerHTML = '<div class="tag-empty">加载中...</div>';
       try {
         const nameQuery = tagSearch ? `&name=${encodeURIComponent(tagSearch)}` : '';
         const res = await fetch(`api/v1/tags/${encodeURIComponent(selectedNamespace)}/${encodeURIComponent(selectedRepo)}?serverUrl=${encodeURIComponent(serverUrl)}&serverToken=${encodeURIComponent(serverToken)}${nameQuery}`);
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Tags failed');
+        if (!res.ok) throw new Error(data.error || '标签加载失败');
         if (!data.results || !data.results.length) {
-          tagListEl.innerHTML = '<div class="tag-empty">No tags found</div>';
+          tagListEl.innerHTML = '<div class="tag-empty">未找到标签</div>';
           return;
         }
         tagListEl.innerHTML = data.results.slice(0, 30).map(t => `
           <span class="tag-chip" data-tag="${escapeHtml(t.name)}" onclick="selectTag('${escapeJs(t.name)}')">${escapeHtml(t.name)} ${t.size ? `(${formatBytes(t.size)})` : ''}</span>
         `).join('');
       } catch (err) {
-        tagListEl.innerHTML = '<div class="tag-empty">Error: ' + escapeHtml(err.message) + '</div>';
+        tagListEl.innerHTML = '<div class="tag-empty">错误：' + escapeHtml(err.message) + '</div>';
       }
     }
 
     function selectTag(tag) {
       document.getElementById('tag').value = tag;
       const selTag = document.getElementById('selectedTag');
-      selTag.innerHTML = 'Selected: <strong>' + escapeHtml(tag) + '</strong>';
+      selTag.innerHTML = '已选标签：<strong>' + escapeHtml(tag) + '</strong>';
       selTag.className = 'selected-tag show';
       document.querySelectorAll('.tag-chip').forEach(el => {
         el.classList.toggle('active', el.dataset.tag === tag);
@@ -505,7 +505,7 @@
         return;
       }
       el.style.display = 'block';
-      el.innerHTML = `Will deploy <strong>${escapeHtml(image)}:${escapeHtml(tag)}</strong>`;
+      el.innerHTML = `将部署 <strong>${escapeHtml(image)}:${escapeHtml(tag)}</strong>`;
     }
 
     function escapeHtml(str) {
@@ -534,7 +534,7 @@
       const jobs = await res.json();
       const el = document.getElementById('jobsList');
       if (!jobs.length) {
-        el.innerHTML = '<div class="empty">No jobs yet</div>';
+        el.innerHTML = '<div class="empty">暂无任务</div>';
         return;
       }
       el.innerHTML = jobs.map(job => `
@@ -559,7 +559,7 @@
           document.getElementById('serverUrl').value = data.serverUrl;
         }
       } catch (err) {
-        console.error('Failed to load config', err);
+        console.error('加载配置失败', err);
       }
     }
     function updateDeployButton() {

@@ -1,42 +1,42 @@
 # DockDock Agent
 
-User-side agent for managing local Docker containers and receiving images from a DockDock server.
+用于从 DockDock Server 下载 Docker 镜像的客户端。
 
-## Requirements
+## 环境要求
 
 - Node.js 18+
-- Docker installed and available in PATH
+- 已安装 Docker，且 `docker` 命令在 PATH 中可用
 
-## Install
+## 安装
 
 ```bash
 npm install
 cp .env.example .env
 ```
 
-Edit `.env` to adjust the default Server URL, port, and host if needed.
+按需编辑 `.env`，调整默认端口、监听地址和 Server URL。
 
-## Run
+## 运行
 
 ```bash
 npm run dev
 ```
 
-Agent listens on `http://0.0.0.0:8910` by default.
+Agent 默认监听 `http://0.0.0.0:8910`。
 
-Open the browser at `http://服务器IP:8910` to use the web UI.
+打开浏览器访问 `http://服务器IP:8910` 即可使用 Web 界面。
 
-## Environment Variables
+## 环境变量
 
-| Variable | Default | Description |
+| 变量 | 默认值 | 说明 |
 |----------|---------|-------------|
-| `PORT` | `8910` | Agent listening port |
-| `HOST` | `0.0.0.0` | Agent listening host |
-| `DEFAULT_SERVER_URL` | `https://dockdock.baiduapi.com` | Default Server URL shown in the web UI |
+| `PORT` | `8910` | Agent 监听端口 |
+| `HOST` | `0.0.0.0` | Agent 监听地址 |
+| `DEFAULT_SERVER_URL` | `https://dockdock.baiduapi.com` | Web 界面中默认显示的 Server URL |
 
 ## API
 
-### Deploy an image
+### 部署镜像
 
 ```bash
 POST /api/v1/deploy
@@ -48,7 +48,7 @@ POST /api/v1/deploy
 }
 ```
 
-Response:
+响应：
 
 ```json
 {
@@ -57,38 +57,26 @@ Response:
 }
 ```
 
-### List all jobs
+### 列出所有任务
 
 ```bash
 GET /api/v1/jobs
 ```
 
-### Check job status
+### 查看任务状态
 
 ```bash
 GET /api/v1/jobs/:id
 ```
 
-### List local images
-
-```bash
-GET /api/v1/images
-```
-
-### Search Docker Hub images (proxied through Server)
+### 搜索 Docker Hub 镜像（通过 Server 代理）
 
 ```bash
 GET /api/v1/search?q=nginx&serverUrl=https://dockdock.baiduapi.com
 ```
 
-### List image tags (proxied through Server)
+### 列出镜像标签（通过 Server 代理）
 
 ```bash
 GET /api/v1/tags/library/nginx?serverUrl=https://dockdock.baiduapi.com
-```
-
-### List local containers
-
-```bash
-GET /api/v1/containers
 ```

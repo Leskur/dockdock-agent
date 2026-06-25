@@ -33,8 +33,8 @@ DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${LATEST_TAG}/${ASSET
 
 # Download
 TMP_DIR=$(mktemp -d)
-echo "Downloading ${ASSET_NAME}..."
-curl -fsSL "$DOWNLOAD_URL" -o "${TMP_DIR}/${ASSET_NAME}"
+echo "Downloading from: ${DOWNLOAD_URL}"
+curl -fSL "$DOWNLOAD_URL" -o "${TMP_DIR}/${ASSET_NAME}"
 
 # Extract
 echo "Extracting..."

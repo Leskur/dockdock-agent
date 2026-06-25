@@ -5,45 +5,315 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DockDock Agent</title>
   <style>
-    body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
-    label { display: block; margin-top: 12px; font-weight: 600; }
-    input, button { padding: 10px; margin: 4px 0; width: 100%; box-sizing: border-box; }
-    button { cursor: pointer; background: #2563eb; color: white; border: none; border-radius: 4px; }
-    button:hover { background: #1d4ed8; }
-    #status { margin-top: 20px; padding: 12px; background: #f4f4f4; border-radius: 4px; white-space: pre-wrap; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      padding: 0;
+      color: #111827;
+    }
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+      color: #2563eb;
+    }
+    nav {
+      display: flex;
+      gap: 8px;
+    }
+    .tab {
+      background: transparent;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      color: #6b7280;
+    }
+    .tab:hover { background: #f3f4f6; }
+    .tab.active { background: #2563eb; color: #ffffff; }
+    main {
+      max-width: 960px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .card {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
+    }
+    .card h2 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+    label { display: block; margin-top: 14px; font-weight: 500; font-size: 14px; }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    input:focus { outline: none; border-color: #2563eb; }
+    .btn-primary {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: #2563eb;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-primary:disabled { background: #93c5fd; cursor: not-allowed; }
+    .status {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 6px;
+      background: #f3f4f6;
+      font-size: 14px;
+      display: none;
+    }
+    .status.show { display: block; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .badge-requesting { background: #e0e7ff; color: #3730a3; }
+    .badge-downloading { background: #dbeafe; color: #1e40af; }
+    .badge-loading { background: #fce7f3; color: #9d174d; }
+    .badge-ready { background: #d1fae5; color: #065f46; }
+    .badge-failed { background: #fee2e2; color: #991b1b; }
+    .job-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .job-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .job-meta {
+      font-size: 12px;
+      color: #6b7280;
+    }
+    .job-error {
+      margin-top: 8px;
+      color: #991b1b;
+      font-size: 13px;
+    }
+    .progress-bar {
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 3px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .progress-bar > div {
+      height: 100%;
+      background: #2563eb;
+      transition: width 0.3s;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    th { color: #6b7280; font-weight: 500; }
+    .empty { color: #6b7280; text-align: center; padding: 24px; }
+    .refresh { float: right; font-size: 13px; color: #2563eb; cursor: pointer; }
+    .search-row {
+      display: flex;
+      gap: 8px;
+    }
+    .search-row input { flex: 1; margin-top: 0; }
+    .btn-secondary {
+      padding: 10px 16px;
+      background: #ffffff;
+      color: #2563eb;
+      border: 1px solid #2563eb;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .btn-secondary:hover { background: #eff6ff; }
+    .btn-secondary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .search-results {
+      margin-top: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      max-height: 240px;
+      overflow-y: auto;
+      display: none;
+    }
+    .search-results.show { display: block; }
+    .search-result-item {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      cursor: pointer;
+    }
+    .search-result-item:hover { background: #f9fafb; }
+    .search-result-item:last-child { border-bottom: none; }
+    .result-name { font-weight: 600; font-size: 14px; }
+    .result-desc { font-size: 12px; color: #6b7280; margin-top: 2px; }
+    .result-meta { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+    .tag-section { margin-top: 12px; }
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .tag-chip {
+      padding: 6px 10px;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .tag-chip:hover { background: #eff6ff; border-color: #2563eb; color: #2563eb; }
+    .tag-chip.active { background: #2563eb; color: #ffffff; border-color: #2563eb; }
+    .tag-empty { font-size: 13px; color: #6b7280; }
+    .selected-image { margin-top: 8px; font-size: 13px; color: #2563eb; }
   </style>
 </head>
 <body>
-  <h1>DockDock Agent</h1>
-  <form id="deployForm">
-    <label>Image</label>
-    <input type="text" id="image" value="nginx" required>
+  <header>
+    <h1>DockDock Agent</h1>
+    <nav>
+      <button class="tab active" data-tab="deploy">Deploy</button>
+      <button class="tab" data-tab="jobs">Jobs</button>
+      <button class="tab" data-tab="images">Images</button>
+      <button class="tab" data-tab="containers">Containers</button>
+    </nav>
+  </header>
 
-    <label>Tag</label>
-    <input type="text" id="tag" value="1.25" required>
+  <main>
+    <section id="deploy" class="panel active">
+      <div class="card">
+        <h2>Deploy Image</h2>
+        <form id="deployForm">
+          <label>Search Docker Hub</label>
+          <div class="search-row">
+            <input type="text" id="searchQuery" placeholder="nginx, redis, node...">
+            <button type="button" class="btn-secondary" id="searchBtn" onclick="searchImages()">Search</button>
+          </div>
+          <div id="searchResults" class="search-results"></div>
 
-    <label>Server URL</label>
-    <input type="text" id="serverUrl" value="http://localhost:3000" required>
+          <label>Image</label>
+          <input type="text" id="image" placeholder="e.g. nginx" required>
+          <div id="selectedImage" class="selected-image"></div>
 
-    <label>Server Token (optional)</label>
-    <input type="text" id="serverToken">
+          <label>Tag</label>
+          <input type="text" id="tag" placeholder="e.g. 1.25 (default: latest)">
+          <div class="tag-section">
+            <div id="tagList" class="tag-list"></div>
+          </div>
 
-    <button type="submit">Deploy</button>
-  </form>
-  <div id="status"></div>
+          <label>Server URL</label>
+          <input type="text" id="serverUrl" value="http://localhost:3456" required>
+
+          <label>Server Token (optional)</label>
+          <input type="text" id="serverToken">
+
+          <button type="button" class="btn-primary" id="deployBtn" onclick="deployImage()">Deploy</button>
+        </form>
+        <div id="deployStatus" class="status"></div>
+      </div>
+    </section>
+
+    <section id="jobs" class="panel">
+      <div class="card">
+        <h2>Deployment Jobs <span class="refresh" onclick="loadJobs()">Refresh</span></h2>
+        <div id="jobsList"><div class="empty">No jobs yet</div></div>
+      </div>
+    </section>
+
+    <section id="images" class="panel">
+      <div class="card">
+        <h2>Local Images <span class="refresh" onclick="loadImages()">Refresh</span></h2>
+        <div id="imagesList"><div class="empty">Loading...</div></div>
+      </div>
+    </section>
+
+    <section id="containers" class="panel">
+      <div class="card">
+        <h2>Local Containers <span class="refresh" onclick="loadContainers()">Refresh</span></h2>
+        <div id="containersList"><div class="empty">Loading...</div></div>
+      </div>
+    </section>
+  </main>
 
   <script>
-    const form = document.getElementById('deployForm');
-    const statusEl = document.getElementById('status');
+    const tabs = document.querySelectorAll('.tab');
+    const panels = document.querySelectorAll('.panel');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+    });
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    let jobsInterval = null;
+
+    function switchTab(tabId) {
+      tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tabId));
+      panels.forEach(p => p.classList.toggle('active', p.id === tabId));
+      if (tabId === 'jobs') {
+        loadJobs();
+        if (!jobsInterval) jobsInterval = setInterval(loadJobs, 2000);
+      } else {
+        if (jobsInterval) {
+          clearInterval(jobsInterval);
+          jobsInterval = null;
+        }
+      }
+      if (tabId === 'images') loadImages();
+      if (tabId === 'containers') loadContainers();
+    }
+
+    const deployBtn = document.getElementById('deployBtn');
+    const deployStatus = document.getElementById('deployStatus');
+
+    async function deployImage() {
+      const form = document.getElementById('deployForm');
+      if (!form.reportValidity()) return;
+      deployBtn.disabled = true;
+      deployStatus.textContent = 'Starting deployment...';
+      deployStatus.className = 'status show';
       const image = document.getElementById('image').value;
       const tag = document.getElementById('tag').value;
       const serverUrl = document.getElementById('serverUrl').value;
       const serverToken = document.getElementById('serverToken').value;
-
-      statusEl.textContent = 'Starting...';
       try {
         const res = await fetch('/api/v1/deploy', {
           method: 'POST',
@@ -52,23 +322,194 @@
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed');
-        statusEl.textContent = 'Job: ' + data.id;
-        poll(data.id);
+        deployStatus.textContent = 'Deployment started: ' + data.id;
+        switchTab('jobs');
       } catch (err) {
-        statusEl.textContent = 'Error: ' + err.message;
+        deployStatus.textContent = 'Error: ' + err.message;
+      } finally {
+        deployBtn.disabled = false;
+      }
+    }
+
+    document.getElementById('searchQuery').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        searchImages();
       }
     });
 
-    async function poll(id) {
-      const interval = setInterval(async () => {
-        const res = await fetch('/api/v1/jobs/' + id);
+    let selectedNamespace = '';
+    let selectedRepo = '';
+
+    async function searchImages() {
+      const query = document.getElementById('searchQuery').value.trim();
+      const serverUrl = document.getElementById('serverUrl').value.trim();
+      const serverToken = document.getElementById('serverToken').value.trim();
+      const resultsEl = document.getElementById('searchResults');
+      const btn = document.getElementById('searchBtn');
+      if (!query) return;
+      if (!serverUrl) {
+        resultsEl.innerHTML = '<div class="empty">Please fill Server URL first</div>';
+        resultsEl.className = 'search-results show';
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'Searching...';
+      resultsEl.innerHTML = '<div class="empty">Searching...</div>';
+      resultsEl.className = 'search-results show';
+      try {
+        const res = await fetch(`/api/v1/search?q=${encodeURIComponent(query)}&serverUrl=${encodeURIComponent(serverUrl)}&serverToken=${encodeURIComponent(serverToken)}`);
         const data = await res.json();
-        statusEl.textContent = JSON.stringify(data, null, 2);
-        if (data.status === 'ready' || data.status === 'failed') {
-          clearInterval(interval);
+        if (!res.ok) throw new Error(data.error || 'Search failed');
+        if (!data.results || !data.results.length) {
+          resultsEl.innerHTML = '<div class="empty">No results</div>';
+          return;
         }
-      }, 2000);
+        resultsEl.innerHTML = data.results.map(r => {
+          const displayPath = r.namespace === 'library' ? r.repo : `${r.namespace}/${r.repo}`;
+          return `
+            <div class="search-result-item" onclick="selectImage('${escapeJs(r.namespace)}', '${escapeJs(r.repo)}')">
+              <div class="result-name">${escapeHtml(r.name || displayPath)} ${r.isOfficial ? '<span style="color:#2563eb">✓ Official</span>' : ''}</div>
+              <div class="result-desc">${escapeHtml(r.description || 'No description')}</div>
+              <div class="result-meta">Stars: ${formatNumber(r.starCount)} | Pulls: ${escapeHtml(r.pullCount)}</div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        resultsEl.innerHTML = '<div class="empty">Error: ' + escapeHtml(err.message) + '</div>';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Search';
+      }
     }
+
+    function selectImage(namespace, repo) {
+      selectedNamespace = namespace;
+      selectedRepo = repo;
+      const displayName = namespace === 'library' ? repo : `${namespace}/${repo}`;
+      document.getElementById('image').value = displayName;
+      document.getElementById('selectedImage').textContent = 'Selected: ' + displayName;
+      document.getElementById('searchResults').className = 'search-results';
+      loadTags();
+    }
+
+    async function loadTags() {
+      if (!selectedNamespace || !selectedRepo) return;
+      const serverUrl = document.getElementById('serverUrl').value.trim();
+      const serverToken = document.getElementById('serverToken').value.trim();
+      const tagListEl = document.getElementById('tagList');
+      tagListEl.innerHTML = '<div class="tag-empty">Loading tags...</div>';
+      try {
+        const res = await fetch(`/api/v1/tags/${encodeURIComponent(selectedNamespace)}/${encodeURIComponent(selectedRepo)}?serverUrl=${encodeURIComponent(serverUrl)}&serverToken=${encodeURIComponent(serverToken)}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Tags failed');
+        if (!data.results || !data.results.length) {
+          tagListEl.innerHTML = '<div class="tag-empty">No tags found</div>';
+          return;
+        }
+        tagListEl.innerHTML = data.results.slice(0, 30).map(t => `
+          <span class="tag-chip" data-tag="${escapeHtml(t.name)}" onclick="selectTag('${escapeJs(t.name)}')">${escapeHtml(t.name)} ${t.size ? `(${formatBytes(t.size)})` : ''}</span>
+        `).join('');
+      } catch (err) {
+        tagListEl.innerHTML = '<div class="tag-empty">Error: ' + escapeHtml(err.message) + '</div>';
+      }
+    }
+
+    function selectTag(tag) {
+      document.getElementById('tag').value = tag;
+      document.querySelectorAll('.tag-chip').forEach(el => {
+        el.classList.toggle('active', el.dataset.tag === tag);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function escapeJs(str) {
+      return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    }
+
+    function formatNumber(num) {
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+      return num;
+    }
+
+    function formatBytes(bytes) {
+      if (bytes >= 1024 * 1024 * 1024) return (bytes / 1024 / 1024 / 1024).toFixed(1) + ' GB';
+      if (bytes >= 1024 * 1024) return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+      if (bytes >= 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return bytes + ' B';
+    }
+
+    async function loadJobs() {
+      const res = await fetch('/api/v1/jobs');
+      const jobs = await res.json();
+      const el = document.getElementById('jobsList');
+      if (!jobs.length) {
+        el.innerHTML = '<div class="empty">No jobs yet</div>';
+        return;
+      }
+      el.innerHTML = jobs.map(job => `
+        <div class="job-item">
+          <div class="job-header">
+            <strong>${job.image}:${job.tag}</strong>
+            <span class="badge badge-${job.status}">${job.status}</span>
+          </div>
+          <div class="job-meta">ID: ${job.id}</div>
+          <div class="progress-bar"><div style="width: ${job.progress}%"></div></div>
+          ${job.error ? `<div class="job-error">${job.error}</div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    async function loadImages() {
+      const res = await fetch('/api/v1/images');
+      const images = await res.json();
+      const el = document.getElementById('imagesList');
+      if (!images.length) {
+        el.innerHTML = '<div class="empty">No local images</div>';
+        return;
+      }
+      el.innerHTML = `
+        <table>
+          <tr><th>Repository</th><th>Tag</th><th>Image ID</th><th>Size</th></tr>
+          ${images.map(img => `
+            <tr>
+              <td>${img.Repository}</td>
+              <td>${img.Tag}</td>
+              <td>${img.ID.slice(0, 12)}</td>
+              <td>${img.Size}</td>
+            </tr>
+          `).join('')}
+        </table>
+      `;
+    }
+
+    async function loadContainers() {
+      const res = await fetch('/api/v1/containers');
+      const containers = await res.json();
+      const el = document.getElementById('containersList');
+      if (!containers.length) {
+        el.innerHTML = '<div class="empty">No containers</div>';
+        return;
+      }
+      el.innerHTML = `
+        <table>
+          <tr><th>Container</th><th>Image</th><th>Status</th><th>Ports</th></tr>
+          ${containers.map(c => `
+            <tr>
+              <td>${c.Names}</td>
+              <td>${c.Image}</td>
+              <td>${c.State}</td>
+              <td>${c.Ports || '-'}</td>
+            </tr>
+          `).join('')}
+        </table>
+      `;
+    }
+
   </script>
 </body>
 </html>

@@ -19,9 +19,9 @@ npm install
 npm run dev
 ```
 
-Agent listens on `http://0.0.0.0:8080` by default.
+Agent listens on `http://0.0.0.0:8910` by default.
 
-Open the browser at `http://服务器IP:8080` to use the web UI.
+Open the browser at `http://服务器IP:8910` to use the web UI.
 
 ## API
 
@@ -32,7 +32,7 @@ POST /api/v1/deploy
 {
   "image": "nginx",
   "tag": "1.25",
-  "serverUrl": "http://your-server:3000",
+  "serverUrl": "http://your-server:3456",
   "serverToken": "optional"
 }
 ```
@@ -46,10 +46,34 @@ Response:
 }
 ```
 
+### List all jobs
+
+```bash
+GET /api/v1/jobs
+```
+
 ### Check job status
 
 ```bash
 GET /api/v1/jobs/:id
+```
+
+### List local images
+
+```bash
+GET /api/v1/images
+```
+
+### Search Docker Hub images (proxied through Server)
+
+```bash
+GET /api/v1/search?q=nginx&serverUrl=http://your-server:3456
+```
+
+### List image tags (proxied through Server)
+
+```bash
+GET /api/v1/tags/library/nginx?serverUrl=http://your-server:3456
 ```
 
 ### List local containers

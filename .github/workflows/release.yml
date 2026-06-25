@@ -57,3 +57,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: dockdock-agent-linux-*.tar.gz
+          draft: true

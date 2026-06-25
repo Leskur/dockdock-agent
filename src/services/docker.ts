@@ -24,22 +24,6 @@ export async function removeFile(filePath: string): Promise<void> {
   }
 }
 
-export async function listImages(): Promise<any[]> {
-  const out = await runShellCommandWithOutput('docker images --format json');
-  return out
-    .split('\n')
-    .filter(Boolean)
-    .map((line) => JSON.parse(line));
-}
-
-export async function listContainers(): Promise<any[]> {
-  const out = await runShellCommandWithOutput('docker ps -a --format json');
-  return out
-    .split('\n')
-    .filter(Boolean)
-    .map((line) => JSON.parse(line));
-}
-
 function runShellCommand(command: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const child = spawn(command, { shell: true });

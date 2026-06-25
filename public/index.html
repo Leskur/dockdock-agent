@@ -272,8 +272,6 @@
     <nav>
       <button class="tab active" data-tab="deploy">Deploy</button>
       <button class="tab" data-tab="jobs">Jobs</button>
-      <button class="tab" data-tab="images">Images</button>
-      <button class="tab" data-tab="containers">Containers</button>
     </nav>
   </header>
 
@@ -327,19 +325,6 @@
       </div>
     </section>
 
-    <section id="images" class="panel">
-      <div class="card">
-        <h2>Local Images <span class="refresh" onclick="loadImages()">Refresh</span></h2>
-        <div id="imagesList"><div class="empty">Loading...</div></div>
-      </div>
-    </section>
-
-    <section id="containers" class="panel">
-      <div class="card">
-        <h2>Local Containers <span class="refresh" onclick="loadContainers()">Refresh</span></h2>
-        <div id="containersList"><div class="empty">Loading...</div></div>
-      </div>
-    </section>
   </main>
 
   <script>
@@ -363,8 +348,6 @@
           jobsInterval = null;
         }
       }
-      if (tabId === 'images') loadImages();
-      if (tabId === 'containers') loadContainers();
     }
 
     const deployBtn = document.getElementById('deployBtn');
@@ -565,52 +548,6 @@
           ${job.error ? `<div class="job-error">${job.error}</div>` : ''}
         </div>
       `).join('');
-    }
-
-    async function loadImages() {
-      const res = await fetch('api/v1/images');
-      const images = await res.json();
-      const el = document.getElementById('imagesList');
-      if (!images.length) {
-        el.innerHTML = '<div class="empty">No local images</div>';
-        return;
-      }
-      el.innerHTML = `
-        <table>
-          <tr><th>Repository</th><th>Tag</th><th>Image ID</th><th>Size</th></tr>
-          ${images.map(img => `
-            <tr>
-              <td>${img.Repository}</td>
-              <td>${img.Tag}</td>
-              <td>${img.ID.slice(0, 12)}</td>
-              <td>${img.Size}</td>
-            </tr>
-          `).join('')}
-        </table>
-      `;
-    }
-
-    async function loadContainers() {
-      const res = await fetch('api/v1/containers');
-      const containers = await res.json();
-      const el = document.getElementById('containersList');
-      if (!containers.length) {
-        el.innerHTML = '<div class="empty">No containers</div>';
-        return;
-      }
-      el.innerHTML = `
-        <table>
-          <tr><th>Container</th><th>Image</th><th>Status</th><th>Ports</th></tr>
-          ${containers.map(c => `
-            <tr>
-              <td>${c.Names}</td>
-              <td>${c.Image}</td>
-              <td>${c.State}</td>
-              <td>${c.Ports || '-'}</td>
-            </tr>
-          `).join('')}
-        </table>
-      `;
     }
 
     async function loadConfig() {

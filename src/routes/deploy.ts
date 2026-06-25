@@ -62,11 +62,6 @@ export default async function deployRoutes(fastify: FastifyInstance, options: De
     return { ...job };
   });
 
-  fastify.get('/images', async (request, reply) => {
-    const images = await dockerService.listImages();
-    return images;
-  });
-
   fastify.get('/search', async (request, reply) => {
     const { q, serverUrl, serverToken } = request.query as any;
     if (!q || !serverUrl) {
@@ -105,10 +100,6 @@ export default async function deployRoutes(fastify: FastifyInstance, options: De
     return res.json();
   });
 
-  fastify.get('/containers', async (request, reply) => {
-    const containers = await dockerService.listContainers();
-    return containers;
-  });
 }
 
 async function processJob(job: LocalJob, jobs: Map<string, LocalJob>) {

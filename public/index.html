@@ -243,7 +243,7 @@
           </div>
 
           <label>Server URL</label>
-          <input type="text" id="serverUrl" value="http://localhost:3456" required>
+          <input type="text" id="serverUrl" value="https://dockdock.baiduapi.com" required>
 
           <label>Server Token (optional)</label>
           <input type="text" id="serverToken">
@@ -315,7 +315,7 @@
       const serverUrl = document.getElementById('serverUrl').value;
       const serverToken = document.getElementById('serverToken').value;
       try {
-        const res = await fetch('/api/v1/deploy', {
+        const res = await fetch('api/v1/deploy', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image, tag, serverUrl, serverToken }),
@@ -358,7 +358,7 @@
       resultsEl.innerHTML = '<div class="empty">Searching...</div>';
       resultsEl.className = 'search-results show';
       try {
-        const res = await fetch(`/api/v1/search?q=${encodeURIComponent(query)}&serverUrl=${encodeURIComponent(serverUrl)}&serverToken=${encodeURIComponent(serverToken)}`);
+        const res = await fetch(`api/v1/search?q=${encodeURIComponent(query)}&serverUrl=${encodeURIComponent(serverUrl)}&serverToken=${encodeURIComponent(serverToken)}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Search failed');
         if (!data.results || !data.results.length) {
@@ -400,7 +400,7 @@
       const tagListEl = document.getElementById('tagList');
       tagListEl.innerHTML = '<div class="tag-empty">Loading tags...</div>';
       try {
-        const res = await fetch(`/api/v1/tags/${encodeURIComponent(selectedNamespace)}/${encodeURIComponent(selectedRepo)}?serverUrl=${encodeURIComponent(serverUrl)}&serverToken=${encodeURIComponent(serverToken)}`);
+        const res = await fetch(`api/v1/tags/${encodeURIComponent(selectedNamespace)}/${encodeURIComponent(selectedRepo)}?serverUrl=${encodeURIComponent(serverUrl)}&serverToken=${encodeURIComponent(serverToken)}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Tags failed');
         if (!data.results || !data.results.length) {
@@ -444,7 +444,7 @@
     }
 
     async function loadJobs() {
-      const res = await fetch('/api/v1/jobs');
+      const res = await fetch('api/v1/jobs');
       const jobs = await res.json();
       const el = document.getElementById('jobsList');
       if (!jobs.length) {
@@ -465,7 +465,7 @@
     }
 
     async function loadImages() {
-      const res = await fetch('/api/v1/images');
+      const res = await fetch('api/v1/images');
       const images = await res.json();
       const el = document.getElementById('imagesList');
       if (!images.length) {
@@ -488,7 +488,7 @@
     }
 
     async function loadContainers() {
-      const res = await fetch('/api/v1/containers');
+      const res = await fetch('api/v1/containers');
       const containers = await res.json();
       const el = document.getElementById('containersList');
       if (!containers.length) {

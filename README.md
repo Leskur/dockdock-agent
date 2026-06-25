@@ -32,7 +32,7 @@ POST /api/v1/deploy
 {
   "image": "nginx",
   "tag": "1.25",
-  "serverUrl": "http://your-server:3456",
+  "serverUrl": "https://dockdock.baiduapi.com",
   "serverToken": "optional"
 }
 ```
@@ -67,13 +67,13 @@ GET /api/v1/images
 ### Search Docker Hub images (proxied through Server)
 
 ```bash
-GET /api/v1/search?q=nginx&serverUrl=http://your-server:3456
+GET /api/v1/search?q=nginx&serverUrl=https://dockdock.baiduapi.com
 ```
 
 ### List image tags (proxied through Server)
 
 ```bash
-GET /api/v1/tags/library/nginx?serverUrl=http://your-server:3456
+GET /api/v1/tags/library/nginx?serverUrl=https://dockdock.baiduapi.com
 ```
 
 ### List local containers

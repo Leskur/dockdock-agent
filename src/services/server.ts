@@ -9,7 +9,7 @@ export async function requestDownload(
   tag: string,
   token?: string
 ): Promise<{ id: string; status: string }> {
-  const res = await fetch(`${SERVER_URL}/images/download`, {
+  const res = await fetch(`${SERVER_URL}/images/jobs`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -30,8 +30,8 @@ export async function requestDownload(
 export async function getServerStatus(
   serverJobId: string,
   token?: string
-): Promise<{ status: string; error?: string }> {
-  const res = await fetch(`${SERVER_URL}/images/download/${serverJobId}/status`, {
+): Promise<{ id: string; image: string; tag: string; status: string; progress: number; error?: string; createdAt: number; updatedAt: number }> {
+  const res = await fetch(`${SERVER_URL}/images/jobs/${serverJobId}`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
 
@@ -41,7 +41,7 @@ export async function getServerStatus(
   }
 
   const data = await res.json();
-  return data as { status: string; error?: string };
+  return data as { id: string; image: string; tag: string; status: string; progress: number; error?: string; createdAt: number; updatedAt: number };
 }
 
 export async function downloadFile(
@@ -49,7 +49,7 @@ export async function downloadFile(
   filePath: string,
   token?: string
 ): Promise<void> {
-  const res = await fetch(`${SERVER_URL}/images/download/${serverJobId}/file`, {
+  const res = await fetch(`${SERVER_URL}/images/jobs/${serverJobId}/file`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
 

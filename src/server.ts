@@ -1,8 +1,8 @@
 import Fastify from 'fastify';
 import path from 'path';
 import fs from 'fs';
-import deployRoutes from './routes/deploy';
-import searchRoutes from './routes/search';
+import jobsRoutes from './routes/jobs';
+import imagesRoutes from './routes/images';
 
 function getIndexHtml(): Buffer {
   try {
@@ -24,11 +24,11 @@ export async function buildServer() {
     reply.type('text/html').send(indexHtml);
   });
 
-  await fastify.register(deployRoutes, {
+  await fastify.register(jobsRoutes, {
     prefix: '/api',
   });
 
-  await fastify.register(searchRoutes, {
+  await fastify.register(imagesRoutes, {
     prefix: '/api',
   });
 

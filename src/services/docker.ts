@@ -1,8 +1,24 @@
 import { spawn } from 'child_process';
 import fs from 'fs/promises';
 import path from 'path';
+import os from 'os';
 
-const STORAGE_DIR = path.join(process.cwd(), 'storage');
+function getDataDir(appName: string): string {
+  const env = process.env.DATA_DIR;
+  if (env) return env;
+
+  const home = os.homedir();
+  switch (process.platform) {
+    case 'win32':
+      return path.join(process.env.APPDATA || home, appName);
+    case 'darwin':
+      return path.join(home, 'Library', 'Application Support', appName);
+    default:
+      return path.join('/var/lib', appName);
+  }
+}
+
+const STORAGE_DIR = path.join(getDataDir('dockdock-agent'), 'storage');
 
 export async function ensureStorageDir(): Promise<void> {
   await fs.mkdir(STORAGE_DIR, { recursive: true });

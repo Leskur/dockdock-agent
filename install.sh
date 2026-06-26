@@ -61,7 +61,6 @@ ExecStart=${INSTALL_DIR}/dockdock-agent
 Restart=on-failure
 RestartSec=5
 Environment=PORT=8910
-Environment=HOST=0.0.0.0
 
 [Install]
 WantedBy=multi-user.target

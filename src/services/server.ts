@@ -9,7 +9,7 @@ export async function requestDownload(
   tag: string,
   token?: string
 ): Promise<{ id: string; status: string }> {
-  const res = await fetch(`${SERVER_URL}/api/v1/images/download`, {
+  const res = await fetch(`${SERVER_URL}/images/download`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ export async function getServerStatus(
   serverJobId: string,
   token?: string
 ): Promise<{ status: string; error?: string }> {
-  const res = await fetch(`${SERVER_URL}/api/v1/images/download/${serverJobId}/status`, {
+  const res = await fetch(`${SERVER_URL}/images/download/${serverJobId}/status`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
 
@@ -49,7 +49,7 @@ export async function downloadFile(
   filePath: string,
   token?: string
 ): Promise<void> {
-  const res = await fetch(`${SERVER_URL}/api/v1/images/download/${serverJobId}/file`, {
+  const res = await fetch(`${SERVER_URL}/images/download/${serverJobId}/file`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
 
@@ -67,7 +67,7 @@ export async function downloadFile(
 }
 
 export async function searchImages(query: string): Promise<any> {
-  const res = await fetch(`${SERVER_URL}/api/v1/images/search?q=${encodeURIComponent(query)}`);
+  const res = await fetch(`${SERVER_URL}/images/search?q=${encodeURIComponent(query)}`);
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`Search failed: ${res.status} ${text}`);
@@ -81,7 +81,7 @@ export async function listTags(namespace: string, repo: string, name?: string): 
     params.set('name', name.trim());
   }
   const queryString = params.toString() ? `?${params.toString()}` : '';
-  const res = await fetch(`${SERVER_URL}/api/v1/images/tags/${encodeURIComponent(namespace)}/${encodeURIComponent(repo)}${queryString}`);
+  const res = await fetch(`${SERVER_URL}/images/tags/${encodeURIComponent(namespace)}/${encodeURIComponent(repo)}${queryString}`);
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`Tags failed: ${res.status} ${text}`);

@@ -2,13 +2,14 @@ import { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
 import fs from 'fs';
 
+const SERVER_URL = 'https://dockdock.baiduapi.com';
+
 export async function requestDownload(
-  serverUrl: string,
   image: string,
   tag: string,
   token?: string
 ): Promise<{ id: string; status: string }> {
-  const res = await fetch(`${serverUrl}/api/v1/images/download`, {
+  const res = await fetch(`${SERVER_URL}/api/v1/images/download`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -27,11 +28,10 @@ export async function requestDownload(
 }
 
 export async function getServerStatus(
-  serverUrl: string,
   serverJobId: string,
   token?: string
 ): Promise<{ status: string; error?: string }> {
-  const res = await fetch(`${serverUrl}/api/v1/images/download/${serverJobId}/status`, {
+  const res = await fetch(`${SERVER_URL}/api/v1/images/download/${serverJobId}/status`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
 
@@ -45,12 +45,11 @@ export async function getServerStatus(
 }
 
 export async function downloadFile(
-  serverUrl: string,
   serverJobId: string,
   filePath: string,
   token?: string
 ): Promise<void> {
-  const res = await fetch(`${serverUrl}/api/v1/images/download/${serverJobId}/file`, {
+  const res = await fetch(`${SERVER_URL}/api/v1/images/download/${serverJobId}/file`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
 
@@ -65,4 +64,27 @@ export async function downloadFile(
 
   const fileStream = fs.createWriteStream(filePath);
   await pipeline(Readable.fromWeb(res.body as any), fileStream);
+}
+
+export async function searchImages(query: string): Promise<any> {
+  const res = await fetch(`${SERVER_URL}/api/v1/images/search?q=${encodeURIComponent(query)}`);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Search failed: ${res.status} ${text}`);
+  }
+  return res.json();
+}
+
+export async function listTags(namespace: string, repo: string, name?: string): Promise<any> {
+  const params = new URLSearchParams();
+  if (name && name.trim()) {
+    params.set('name', name.trim());
+  }
+  const queryString = params.toString() ? `?${params.toString()}` : '';
+  const res = await fetch(`${SERVER_URL}/api/v1/images/tags/${encodeURIComponent(namespace)}/${encodeURIComponent(repo)}${queryString}`);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Tags failed: ${res.status} ${text}`);
+  }
+  return res.json();
 }

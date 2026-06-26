@@ -1,6 +1,6 @@
 {
   "name": "dockdock-agent",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "DockDock Agent for managing local Docker containers",
   "main": "dist/index.js",
   "scripts": {

@@ -2,10 +2,7 @@ import Fastify from 'fastify';
 import path from 'path';
 import fs from 'fs';
 import deployRoutes from './routes/deploy';
-
-interface ServerConfig {
-  defaultServerUrl?: string;
-}
+import searchRoutes from './routes/search';
 
 function getIndexHtml(): Buffer {
   try {
@@ -18,7 +15,7 @@ function getIndexHtml(): Buffer {
   return fs.readFileSync(path.join(__dirname, '../public/index.html'));
 }
 
-export async function buildServer(config: ServerConfig = {}) {
+export async function buildServer() {
   const fastify = Fastify({ logger: true });
 
   const indexHtml = getIndexHtml();
@@ -29,7 +26,10 @@ export async function buildServer(config: ServerConfig = {}) {
 
   await fastify.register(deployRoutes, {
     prefix: '/api/v1',
-    defaultServerUrl: config.defaultServerUrl,
+  });
+
+  await fastify.register(searchRoutes, {
+    prefix: '/api/v1',
   });
 
   return fastify;

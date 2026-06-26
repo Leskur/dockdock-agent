@@ -1,10 +1,9 @@
 import { buildServer } from './server';
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8910;
-const DEFAULT_SERVER_URL = process.env.DEFAULT_SERVER_URL || 'https://dockdock.baiduapi.com';
 
 async function main() {
-  const server = await buildServer({ defaultServerUrl: DEFAULT_SERVER_URL });
+  const server = await buildServer();
   await server.listen({ port: PORT });
 }
 

@@ -282,7 +282,6 @@
         <form id="deployForm">
           <input type="text" id="image" style="display:none" required>
           <input type="text" id="tag" style="display:none">
-          <input type="text" id="serverUrl" style="display:none" value="https://dockdock.baiduapi.com" required>
           <input type="text" id="serverToken" style="display:none">
 
           <div class="form-section">
@@ -361,13 +360,12 @@
       deployStatus.className = 'status show';
       const image = document.getElementById('image').value;
       const tag = document.getElementById('tag').value;
-      const serverUrl = document.getElementById('serverUrl').value;
       const serverToken = document.getElementById('serverToken').value;
       try {
         const res = await fetch('api/v1/deploy', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image, tag, serverUrl, serverToken }),
+          body: JSON.stringify({ image, tag, serverToken }),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || '部署失败');
@@ -399,22 +397,15 @@
 
     async function searchImages() {
       const query = document.getElementById('searchQuery').value.trim();
-      const serverUrl = document.getElementById('serverUrl').value.trim();
-      const serverToken = document.getElementById('serverToken').value.trim();
       const resultsEl = document.getElementById('searchResults');
       const btn = document.getElementById('searchBtn');
       if (!query) return;
-      if (!serverUrl) {
-        resultsEl.innerHTML = '<div class="empty">请先填写 Server URL</div>';
-        resultsEl.className = 'search-results show';
-        return;
-      }
       btn.disabled = true;
       btn.textContent = '搜索中...';
       resultsEl.innerHTML = '<div class="empty">搜索中...</div>';
       resultsEl.className = 'search-results show';
       try {
-        const res = await fetch(`api/v1/search?q=${encodeURIComponent(query)}&serverUrl=${encodeURIComponent(serverUrl)}&serverToken=${encodeURIComponent(serverToken)}`);
+        const res = await fetch(`api/v1/search?q=${encodeURIComponent(query)}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || '搜索失败');
         if (!data.results || !data.results.length) {
@@ -462,14 +453,12 @@
 
     async function loadTags() {
       if (!selectedNamespace || !selectedRepo) return;
-      const serverUrl = document.getElementById('serverUrl').value.trim();
-      const serverToken = document.getElementById('serverToken').value.trim();
       const tagSearch = document.getElementById('tagSearch').value.trim();
       const tagListEl = document.getElementById('tagList');
       tagListEl.innerHTML = '<div class="tag-empty">加载中...</div>';
       try {
-        const nameQuery = tagSearch ? `&name=${encodeURIComponent(tagSearch)}` : '';
-        const res = await fetch(`api/v1/tags/${encodeURIComponent(selectedNamespace)}/${encodeURIComponent(selectedRepo)}?serverUrl=${encodeURIComponent(serverUrl)}&serverToken=${encodeURIComponent(serverToken)}${nameQuery}`);
+        const nameQuery = tagSearch ? `?name=${encodeURIComponent(tagSearch)}` : '';
+        const res = await fetch(`api/v1/tags/${encodeURIComponent(selectedNamespace)}/${encodeURIComponent(selectedRepo)}${nameQuery}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || '标签加载失败');
         if (!data.results || !data.results.length) {
@@ -550,24 +539,11 @@
       `).join('');
     }
 
-    async function loadConfig() {
-      try {
-        const res = await fetch('api/v1/config');
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data.serverUrl) {
-          document.getElementById('serverUrl').value = data.serverUrl;
-        }
-      } catch (err) {
-        console.error('加载配置失败', err);
-      }
-    }
     function updateDeployButton() {
       const form = document.getElementById('deployForm');
       deployBtn.disabled = !form.checkValidity();
     }
 
-    loadConfig();
     updateDeployButton();
     updateDeploySummary();
 

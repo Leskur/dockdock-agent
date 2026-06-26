@@ -21,6 +21,23 @@ DockDock Agent 是一个 Docker 镜像部署工具，专为无法正常拉取 Do
 - Linux x64 / arm64
 - 已安装 Docker，且 `docker` 命令在 PATH 中可用
 
+## 临时运行
+
+无需安装，下载后直接运行即可体验：
+
+```bash
+# 下载并解压（以 x64 为例，arm64 请替换为 arm64）
+curl -fSL https://github.com/Leskur/dockdock-agent/releases/latest/download/dockdock-agent-linux-x64.tar.gz -o dockdock-agent.tar.gz
+tar -xzf dockdock-agent.tar.gz
+
+# 直接运行
+./dockdock-agent
+```
+
+Web 界面：`http://服务器IP:8910`
+
+> 自定义端口：`PORT=9000 ./dockdock-agent`
+
 ## 一键安装
 
 ```bash

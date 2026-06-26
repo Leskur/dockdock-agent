@@ -362,7 +362,7 @@
       const tag = document.getElementById('tag').value;
       const serverToken = document.getElementById('serverToken').value;
       try {
-        const res = await fetch('api/v1/deploy', {
+        const res = await fetch('api/deploy', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image, tag, serverToken }),
@@ -405,7 +405,7 @@
       resultsEl.innerHTML = '<div class="empty">搜索中...</div>';
       resultsEl.className = 'search-results show';
       try {
-        const res = await fetch(`api/v1/search?q=${encodeURIComponent(query)}`);
+        const res = await fetch(`api/search?q=${encodeURIComponent(query)}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || '搜索失败');
         if (!data.results || !data.results.length) {
@@ -458,7 +458,7 @@
       tagListEl.innerHTML = '<div class="tag-empty">加载中...</div>';
       try {
         const nameQuery = tagSearch ? `?name=${encodeURIComponent(tagSearch)}` : '';
-        const res = await fetch(`api/v1/tags/${encodeURIComponent(selectedNamespace)}/${encodeURIComponent(selectedRepo)}${nameQuery}`);
+        const res = await fetch(`api/tags/${encodeURIComponent(selectedNamespace)}/${encodeURIComponent(selectedRepo)}${nameQuery}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || '标签加载失败');
         if (!data.results || !data.results.length) {
@@ -519,7 +519,7 @@
     }
 
     async function loadJobs() {
-      const res = await fetch('api/v1/jobs');
+      const res = await fetch('api/jobs');
       const jobs = await res.json();
       const el = document.getElementById('jobsList');
       if (!jobs.length) {

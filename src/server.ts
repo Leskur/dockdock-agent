@@ -25,11 +25,11 @@ export async function buildServer() {
   });
 
   await fastify.register(deployRoutes, {
-    prefix: '/api/v1',
+    prefix: '/api',
   });
 
   await fastify.register(searchRoutes, {
-    prefix: '/api/v1',
+    prefix: '/api',
   });
 
   return fastify;

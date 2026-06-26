@@ -81,7 +81,7 @@ export async function listTags(namespace: string, repo: string, name?: string): 
     params.set('name', name.trim());
   }
   const queryString = params.toString() ? `?${params.toString()}` : '';
-  const res = await fetch(`${SERVER_URL}/images/tags/${encodeURIComponent(namespace)}/${encodeURIComponent(repo)}${queryString}`);
+  const res = await fetch(`${SERVER_URL}/images/${encodeURIComponent(namespace)}/${encodeURIComponent(repo)}/tags${queryString}`);
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`Tags failed: ${res.status} ${text}`);

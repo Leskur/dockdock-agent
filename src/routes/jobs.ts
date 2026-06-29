@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import * as jobService from '../services/job';
+import * as dockerService from '../services/docker';
 
 interface DeployBody {
   image: string;
@@ -14,6 +15,11 @@ export default async function deployRoutes(fastify: FastifyInstance) {
     const tag = request.body.tag || 'latest';
     if (!image) {
       return reply.status(400).send({ error: 'image is required' });
+    }
+
+    const exists = await dockerService.imageExists(image, tag);
+    if (exists) {
+      return reply.status(200).send({ status: 'exists', message: '镜像已存在，无需下载' });
     }
 
     const job = jobService.createJob(image, tag, serverToken);

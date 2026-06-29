@@ -16,6 +16,10 @@ DockDock Agent 是一个 Docker 镜像部署工具，专为无法正常拉取 Do
 <!-- TODO: 添加 Web 界面截图 -->
 ![Web 界面](docs/screenshot.png)
 
+## 适合人群
+
+- 自建服务器，无法使用云服务商镜像加速的用户
+
 ## 环境要求
 
 - Linux x64 / arm64

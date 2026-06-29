@@ -369,8 +369,13 @@
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || '部署失败');
-        deployStatus.textContent = '部署已开始：' + data.id;
-        switchTab('jobs');
+        console.log(data);
+        if (data.status === 'exists') {
+          deployStatus.textContent = data.message;
+        } else {
+          deployStatus.textContent = '部署已开始：' + data.id;
+          switchTab('jobs');
+        }
       } catch (err) {
         deployStatus.textContent = '错误：' + err.message;
       } finally {

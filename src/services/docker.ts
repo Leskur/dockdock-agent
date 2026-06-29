@@ -32,6 +32,12 @@ export function loadImage(filePath: string): Promise<void> {
   return runShellCommand(`docker load -i ${filePath}`);
 }
 
+export function imageExists(image: string, tag: string): Promise<boolean> {
+  return runShellCommandWithOutput(`docker image inspect ${image}:${tag}`)
+    .then(() => true)
+    .catch(() => false);
+}
+
 export async function removeFile(filePath: string): Promise<void> {
   try {
     await fs.unlink(filePath);
